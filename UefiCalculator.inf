@@ -1,0 +1,29 @@
+# Variables defined to be used during the build process
+[Defines]
+  INF_VERSION       = 1.25
+  BASE_NAME         = UefiCalculator
+  FILE_GUID         = d0916d2b-c033-45af-8ef2-76c9d30518ec
+  MODULE_TYPE       = UEFI_APPLICATION
+  VERSION_STRING    = 1.0
+  ENTRY_POINT       = ShellCEntryLib
+
+[Sources]
+  main.c
+  libs/tinyexpr.c
+
+# Required packages
+[Packages]
+  MdePkg/MdePkg.dec            # Contains Uefi and UefiLib
+  ShellPkg/ShellPkg.dec
+  StdLib/StdLib.dec
+
+# Required Libraries
+[LibraryClasses]
+  #UefiApplicationEntryPoint    # Uefi application entry point
+  UefiLib                      # UefiLib
+  LibC
+  ShellCEntryLib  
+  LibMath
+
+[BuildOptions]
+  *:*_*_*_CC_FLAGS = -Wno-error -std=c23

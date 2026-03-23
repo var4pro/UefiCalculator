@@ -1,0 +1,11 @@
+*
+!UefiCalculator.inf
+!UefiCalculator.dsc
+!startup.nsh
+!build_iso.sh
+!main.c
+!libs/
+!libs/**
+!.gitignore
+!README.md
+!LICENSE
