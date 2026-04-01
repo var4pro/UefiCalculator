@@ -85,7 +85,7 @@ int main(int Argc, char **Argv) {
     return 0;
 }
 
-void init(TerminalState* state){
+static void init(TerminalState* state){
     gBS->SetWatchdogTimer(600, 0x0000, 0, NULL);  // 10 min
     gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, EFI_BLUE));
     gST->ConIn->Reset(gST->ConIn, false);  // input reset
@@ -103,7 +103,7 @@ void init(TerminalState* state){
 }
 
 // Handle left, right, up, down, delete
-void handleCommandKeys(EFI_INPUT_KEY key, TerminalState* state){
+static void handleCommandKeys(EFI_INPUT_KEY key, TerminalState* state){
     if (key.ScanCode == 0x01 && (state->viewIndex != state->writeIndex || state->count == 0)) {  //UP checks if user in a view mode and go to the past command if he's
         state->viewIndex = getIndexBackwards(state->viewIndex, state->writeIndex, state->historyCount);
         strcpy(state->buffer, state->history[state->viewIndex]);
@@ -145,7 +145,7 @@ void handleCommandKeys(EFI_INPUT_KEY key, TerminalState* state){
 }
 
 // Handles printable characters, Backspace, Enter, and Ctrl+C
-void handleTextKeys(EFI_INPUT_KEY key, TerminalState* state){
+static void handleTextKeys(EFI_INPUT_KEY key, TerminalState* state){
     if (key.UnicodeChar == 0x08) {  // Backspace: Delete the character to the left of the cursor.
         if (state->index > 0) {
             for (int i = state->index - 1; i < state->count; i++) {  // 1 2
@@ -195,7 +195,7 @@ void handleTextKeys(EFI_INPUT_KEY key, TerminalState* state){
 
 
 // Prints calculating result of an expression or points out to the error place
-void handleRes(double result, int errorPlace) {
+static void handleRes(double result, int errorPlace) {
     if (errorPlace == 0) {
         char doubleBuffer[MAX_DOUBLE_BUFFER_SIZE];
         snprintf(doubleBuffer, sizeof(doubleBuffer), "%.*f", PRECISION, result);
@@ -213,7 +213,7 @@ void handleRes(double result, int errorPlace) {
 }
 
 // Function for scrolling up (to the older commands). Ring buffer. Limited with history size.
-int getIndexBackwards(int viewIndex, int writeIndex, int count) {
+static int getIndexBackwards(int viewIndex, int writeIndex, int count) {
     if (count == 0) return viewIndex;  // History is empty
     int oldestIndex = (count == MAX_HISTORY_SIZE) ? writeIndex : 0;
     
@@ -225,18 +225,14 @@ int getIndexBackwards(int viewIndex, int writeIndex, int count) {
 }
 
 // Function for scrolling down (to the newer commands). Ring buffer. Limited with history size.
-int getIndexForwards(int viewIndex, int writeIndex, int count) {
+static int getIndexForwards(int viewIndex, int writeIndex, int count) {
     if (count == 0) return viewIndex;  // History is empty
-    
-    // if (viewIndex == writeIndex) {
-    //     return viewIndex;
-    // }
     
     return (viewIndex + 1) % MAX_HISTORY_SIZE;
 }
 
 // Checks if last command in history isn't the same as current command and adds command to the history
-void addToTheHistoryLastCommand(TerminalState* state) {
+static void addToTheHistoryLastCommand(TerminalState* state) {
     if (state->historyCount == 0) { // History is empty
         strcpy(state->history[state->writeIndex], state->buffer);
         state->historyCount++;
@@ -257,7 +253,7 @@ void addToTheHistoryLastCommand(TerminalState* state) {
     }
 }
 
-void exitWithWaiting(int exitCode){
+static void exitWithWaiting(int exitCode){
     Print(L"Press any key to exit the app\r\n");
     EFI_INPUT_KEY key = {0};
     UINTN eventIndex = 0;
@@ -273,13 +269,13 @@ void exitWithWaiting(int exitCode){
     }
 }
 
-void printError(const CHAR16* str){
+static void printError(const CHAR16* str){
     gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_RED, EFI_BLUE));
     Print(L"%s\r\n", str);
     gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, EFI_BLUE));
 }
 
-bool equalsIgnoreCase(const char* a, const char* b) {
+static bool equalsIgnoreCase(const char* a, const char* b) {
     while (*a && *b) {
         char ca = (*a >= 'A' && *a <= 'Z') ? *a + 32 : *a;
         char cb = (*b >= 'A' && *b <= 'Z') ? *b + 32 : *b;
