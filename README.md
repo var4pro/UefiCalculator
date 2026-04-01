@@ -22,7 +22,7 @@ Before you begin, ensure you have the following installed and configured:
 1. [EDK II](https://github.com/tianocore/edk2)
 2. [EDK II LibC (EADK)](https://github.com/tianocore/edk2-libc)
 3. GCC 14+
-4. `mkisofs`
+4. `mxorriso`
 
 ### Instructions
 
