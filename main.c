@@ -1,3 +1,4 @@
+#include "libs/tinyexpr.h"
 #include <Library/ShellCEntryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -9,7 +10,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-#include "libs/tinyexpr.h"
 
 
 static constexpr int MAX_BUFFER_SIZE = 256;
