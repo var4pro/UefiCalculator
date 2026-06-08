@@ -4,7 +4,7 @@ An interactive, bare-metal mathematical calculator for the UEFI environment, pow
 
 https://github.com/user-attachments/assets/2a6ef878-3dca-4023-9885-236fa91b8120
 
-## ✨ Features
+## **Features**
 
 - **Expression Evaluation:** Integrated with the tinyexpr library to calculate complex mathematical expressions. Supports floating-point numbers, displaying results with up to 6 decimal places.
 - **Visual Error Detection:** If a syntax error occurs in a mathematical expression, the shell visually points to the exact invalid character using a caret (`^`).
@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/2a6ef878-3dca-4023-9885-236fa91b8120
 
 ---
 
-## 🛠️ Building
+## **Building**
 
 ### Prerequisites
 Before you begin, ensure you have the following installed and configured:
