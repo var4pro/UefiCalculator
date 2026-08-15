@@ -1,72 +1,110 @@
 [Defines]
-  PLATFORM_NAME                  = UefiCalculator
-  PLATFORM_GUID                  = d0916d2b-c033-45af-8ea2-76c9d30518ec
-  PLATFORM_VERSION               = 0.01
-  DSC_SPECIFICATION              = 0x00010006
-  OUTPUT_DIRECTORY               = Build/UefiCalculator
+  PLATFORM_NAME                  = UefiCalculatorPkg
+  PLATFORM_GUID                  = 46A08391-CBF2-4EFD-8FE5-529F4D40AF74
+  PLATFORM_VERSION               = 1.0
+  DSC_SPECIFICATION              = 0x00010005
+  OUTPUT_DIRECTORY               = Build/UefiCalculatorPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64|LOONGARCH64
-  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
+  BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-
-#
-#  Debug output control
-#
-  DEFINE DEBUG_ENABLE_OUTPUT      = FALSE       # Set to TRUE to enable debug output
-  DEFINE DEBUG_PRINT_ERROR_LEVEL  = 0x80000040  # Flags to control amount of debug output
-  DEFINE DEBUG_PROPERTY_MASK      = 0
-
-[PcdsFeatureFlag]
-
-[PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|$(DEBUG_PROPERTY_MASK)
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
-
 [LibraryClasses]
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
   #
-  # Entry Point Libraries
+  # Entry point
   #
-  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-  ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+  PeiCoreEntryPoint|MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+
   #
-  # Common Libraries
+  # Basic
   #
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf  # <--- FIXED THIS
+  SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  !if $(DEBUG_ENABLE_OUTPUT)
-    DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
-    DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
-  !else   ## DEBUG_ENABLE_OUTPUT
-    DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  !endif  ## DEBUG_ENABLE_OUTPUT
-
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
-  SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
-  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
-  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-
-  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
-
+  PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
+  #
+  # UEFI & PI
+  #
+  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
+  DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
+  VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
+
+  #
+  # Generic Modules & Misc
+  #
+  UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+  ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
+  ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
+  SmbusLib|MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  S3BootScriptLib|MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
+  CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
+  PlatformBootManagerLib|MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
+  PciHostBridgeLib|MdeModulePkg/Library/PciHostBridgeLibNull/PciHostBridgeLibNull.inf
+  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+  VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
+  FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
+  ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+  FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
+  BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
+  VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+  MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+  VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
+  SpiHcPlatformLib|MdeModulePkg/Library/BaseSpiHcPlatformLibNull/BaseSpiHcPlatformLibNull.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  TdxMeasurementLib|MdeModulePkg/Library/TdxMeasurementLibNull/TdxMeasurementLibNull.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 [Components]
-  UefiCalculator.inf
+  UefiCalculator/UefiCalculator.inf
 
-
-!include MdePkg/MdeLibs.dsc.inc
-!include StdLib/StdLib.inc
+[PcdsFixedAtBuild]
+  !if $(TARGET) == DEBUG
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0xFFFFFFFF # DEBUG Build: Everything enabled (All 32 bits)
+!else
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000002 # RELEASE Build: WARNING (0x02) and ERROR (0x80000000) only
+!endif
