@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "LogUtils.h"
 
 #include <Protocol/SimpleTextIn.h>
 #include <Uefi.h>
@@ -18,7 +19,8 @@ int snprintf(char* str, unsigned long size, const char* format, ...);
 static constexpr int MAX_BUFFER_SIZE = 256;
 static constexpr int MAX_HISTORY_SIZE = 100;
 static constexpr int MAX_DOUBLE_BUFFER_SIZE = 64;
-static UINTN g_terminalCols = 0, g_terminalRows = 0;;
+static UINTN g_terminalCols = 0, g_terminalRows = 0;
+;
 
 static constexpr char EMPTY_BUFFER[MAX_BUFFER_SIZE] = {[0 ... MAX_BUFFER_SIZE - 2] = ' ', [MAX_BUFFER_SIZE - 1] = '\0'};
 static constexpr int PRECISION = 6;
@@ -65,14 +67,14 @@ int main(int Argc, char** Argv) {
         if (key.ScanCode != 0)
             handleCommandKeys(key, &state);
         else if (key.UnicodeChar != 0)
-            if(handleTextKeys(key, &state) == 1) return 0;//user typed 'exit'
+            if (handleTextKeys(key, &state) == 1) return 0; // user typed 'exit'
 
         if (state.needsRedraw) {
             CHECK_FOR_ERROR(gST->ConOut->EnableCursor(gST->ConOut, false));
             CHECK_FOR_ERROR(gST->ConOut->SetCursorPosition(gST->ConOut, 0, state.promptRow));
             Print(L"> %a%a", state.buffer, EMPTY_BUFFER);
             CHECK_FOR_ERROR(gST->ConOut->SetCursorPosition(gST->ConOut, (state.index + 2) % g_terminalCols,
-                                                          state.promptRow + (state.index + 2) / g_terminalCols));
+                                                           state.promptRow + (state.index + 2) / g_terminalCols));
             CHECK_FOR_ERROR(gST->ConOut->EnableCursor(gST->ConOut, true));
             state.needsRedraw = false;
         }
@@ -82,6 +84,7 @@ int main(int Argc, char** Argv) {
 }
 
 static EFI_STATUS init(TerminalState* state) {
+    TRACE_FUNCTION();
     CHECK_FOR_ERROR(gBS->SetWatchdogTimer(600, 0x0000, 0, NULL)); // 10 min
     CHECK_FOR_ERROR(gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, EFI_BLUE)));
     CHECK_FOR_ERROR(gST->ConIn->Reset(gST->ConIn, false)); // input reset
@@ -97,6 +100,7 @@ static EFI_STATUS init(TerminalState* state) {
 
 // Handle left, right, up, down, delete
 static void handleCommandKeys(EFI_INPUT_KEY key, TerminalState* state) {
+    TRACE_FUNCTION();
     if (key.ScanCode == 0x01 && (state->viewIndex != state->writeIndex ||
                                  state->count == 0)) { // UP checks if user in a view mode and go to the past command if he's
         state->viewIndex = getIndexBackwards(state->viewIndex, state->writeIndex, state->historyCount);
@@ -139,6 +143,7 @@ static void handleCommandKeys(EFI_INPUT_KEY key, TerminalState* state) {
 
 // Handles printable characters, Backspace, Enter, and Ctrl+C
 static int handleTextKeys(EFI_INPUT_KEY key, TerminalState* state) {
+    TRACE_FUNCTION();
     if (key.UnicodeChar == 0x08) { // Backspace: Delete the character to the left of the cursor.
         if (state->index > 0) {
             for (INTN i = state->index - 1; i < state->count; i++) // 1 2
@@ -172,7 +177,7 @@ static int handleTextKeys(EFI_INPUT_KEY key, TerminalState* state) {
         state->index = 0;
         state->buffer[0] = '\0';
         state->needsRedraw = true;
-    } else if (state->count < MAX_BUFFER_SIZE - 1) {      // NORMAL CHAR ...;MAX_BUFFER_SIZE - 1] adds char into the buffer
+    } else if (state->count < MAX_BUFFER_SIZE - 1) {       // NORMAL CHAR ...;MAX_BUFFER_SIZE - 1] adds char into the buffer
         for (INTN i = state->count; i > state->index; i--) // 2 1
             state->buffer[i] = state->buffer[i - 1];
         state->buffer[state->index] = (char)key.UnicodeChar;
@@ -187,9 +192,10 @@ static int handleTextKeys(EFI_INPUT_KEY key, TerminalState* state) {
 // Prints calculating result of an expression or points out to the error place
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 static void handleRes(double result, int errorPlace) {
+    TRACE_FUNCTION();
     if (errorPlace == 0) {
         char doubleBuffer[MAX_DOUBLE_BUFFER_SIZE];
-        snprintf(doubleBuffer, sizeof(doubleBuffer), "%.*f", PRECISION, result);//NOLINT
+        snprintf(doubleBuffer, sizeof(doubleBuffer), "%.*f", PRECISION, result); // NOLINT
         Print(L"Result: %a", doubleBuffer);
         Print(L"\r\n");
     } else {
@@ -203,6 +209,7 @@ static void handleRes(double result, int errorPlace) {
 // Function for scrolling up (to the older commands). Ring buffer. Limited with history size.
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 static int getIndexBackwards(int viewIndex, int writeIndex, int count) {
+    TRACE_FUNCTION();
     if (count == 0) return viewIndex; // History is empty
     int oldestIndex = (count == MAX_HISTORY_SIZE) ? writeIndex : 0;
 
@@ -214,6 +221,7 @@ static int getIndexBackwards(int viewIndex, int writeIndex, int count) {
 // Function for scrolling down (to the newer commands). Ring buffer. Limited with history size.
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 static int getIndexForwards(int viewIndex, int writeIndex, int count) {
+    TRACE_FUNCTION();
     if (count == 0) return viewIndex; // History is empty
 
     return (viewIndex + 1) % MAX_HISTORY_SIZE;
@@ -221,6 +229,7 @@ static int getIndexForwards(int viewIndex, int writeIndex, int count) {
 
 // Checks if last command in history isn't the same as current command and adds command to the history
 static void addToTheHistoryLastCommand(TerminalState* state) {
+    TRACE_FUNCTION();
     if (state->historyCount == 0) { // History is empty
         strcpy(state->history[state->writeIndex], state->buffer);
         state->historyCount++;
@@ -240,6 +249,7 @@ static void addToTheHistoryLastCommand(TerminalState* state) {
 }
 
 static EFI_STATUS printError(const CHAR16* str) {
+    TRACE_FUNCTION();
     CHECK_FOR_ERROR(gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_RED, EFI_BLUE)));
     Print(L"%s\r\n", str);
     CHECK_FOR_ERROR(gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, EFI_BLUE)));
@@ -247,6 +257,7 @@ static EFI_STATUS printError(const CHAR16* str) {
 }
 
 static bool equalsIgnoreCase(const char* a, const char* b) {
+    TRACE_FUNCTION();
     while (*a && *b) {
         char ca = (*a >= 'A' && *a <= 'Z') ? *a + 32 : *a;
         char cb = (*b >= 'A' && *b <= 'Z') ? *b + 32 : *b;

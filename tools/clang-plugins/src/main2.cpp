@@ -48,7 +48,7 @@ namespace uefi {
                 if (!fileMatches) return;
                 // ----------------------------
 
-                if (FD->getNameAsString() == "DriverEntryPoint") return;
+                if (FD->getNameAsString() == "main") return;
 
                 const auto* body = dyn_cast<CompoundStmt>(FD->getBody());
                 if (!body || body->body_empty()) { // TODO: need to check this shit and understand later

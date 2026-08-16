@@ -3,6 +3,7 @@
 -nostdinc
 -fshort-wchar
 -Iinclude/
+-Ilibs/
 
 -isystem
 $EDK2_PATH/ArmPkg/Include

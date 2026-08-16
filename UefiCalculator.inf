@@ -7,7 +7,7 @@
   ENTRY_POINT       = ShellCEntryLib
 
 [Sources]
-  main.c
+  src/Main.c
   libs/tinyexpr.c
 
 [Packages]
@@ -23,4 +23,4 @@
   LibMath
 
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS = -Wno-error -std=c23 -I$(MODULE_DIR)/include/
+  GCC:*_*_*_CC_FLAGS = -Wno-error -std=c23 -I$(MODULE_DIR)/include/ -I$(MODULE_DIR)/libs/
